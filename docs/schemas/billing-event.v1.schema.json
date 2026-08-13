@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.yanchuaner.cn/ecosystem/v1/billing-event.v1.schema.json",
+  "title": "Yanzhong Billing Event v1",
+  "type": "object",
+  "required": ["schema_version", "event_id", "occurred_at", "request_id", "operation", "state", "funding_source", "amount", "idempotency_key"],
+  "properties": {
+    "schema_version": { "$ref": "common-defs.v1.schema.json#/$defs/schemaVersion" },
+    "event_id": { "$ref": "common-defs.v1.schema.json#/$defs/opaqueId" },
+    "occurred_at": { "$ref": "common-defs.v1.schema.json#/$defs/timestamp" },
+    "request_id": { "$ref": "common-defs.v1.schema.json#/$defs/opaqueId" },
+    "trace_id": { "$ref": "common-defs.v1.schema.json#/$defs/opaqueId" },
+    "attempt_id": { "$ref": "common-defs.v1.schema.json#/$defs/opaqueId" },
+    "operation": { "enum": ["accept", "reserve", "dispatch", "settle", "refund", "mark_reconciliation", "reconcile"] },
+    "state": { "enum": ["accepted", "reserved", "dispatched", "settled", "refunded", "reconciliation_required"] },
+    "funding_source": { "enum": ["public_benefit", "campaign", "legacy", "byok"] },
+    "amount": {
+      "type": "object",
+      "required": ["value", "unit"],
+      "properties": {
+        "value": { "type": "integer", "minimum": 0 },
+        "unit": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{1,15}$" }
+      },
+      "additionalProperties": false
+    },
+    "usage": {
+      "type": "object",
+      "properties": {
+        "input_tokens": { "$ref": "common-defs.v1.schema.json#/$defs/nonNegativeInteger" },
+        "output_tokens": { "$ref": "common-defs.v1.schema.json#/$defs/nonNegativeInteger" },
+        "cached_tokens": { "$ref": "common-defs.v1.schema.json#/$defs/nonNegativeInteger" },
+        "images": { "$ref": "common-defs.v1.schema.json#/$defs/nonNegativeInteger" },
+        "duration_ms": { "$ref": "common-defs.v1.schema.json#/$defs/nonNegativeInteger" }
+      },
+      "additionalProperties": true
+    },
+    "price_version": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "idempotency_key": { "$ref": "common-defs.v1.schema.json#/$defs/opaqueId" },
+    "reason_code": { "$ref": "common-defs.v1.schema.json#/$defs/stableCode" },
+    "reconciliation_case_id": { "$ref": "common-defs.v1.schema.json#/$defs/opaqueId" }
+  },
+  "allOf": [
+    {
+      "oneOf": [
+        { "properties": { "operation": { "const": "accept" }, "state": { "const": "accepted" } }, "required": ["operation", "state"] },
+        { "properties": { "operation": { "const": "reserve" }, "state": { "const": "reserved" } }, "required": ["operation", "state"] },
+        { "properties": { "operation": { "const": "dispatch" }, "state": { "const": "dispatched" } }, "required": ["operation", "state"] },
+        { "properties": { "operation": { "const": "settle" }, "state": { "const": "settled" } }, "required": ["operation", "state"] },
+        { "properties": { "operation": { "const": "refund" }, "state": { "const": "refunded" } }, "required": ["operation", "state"] },
+        { "properties": { "operation": { "const": "mark_reconciliation" }, "state": { "const": "reconciliation_required" } }, "required": ["operation", "state"] },
+        { "properties": { "operation": { "const": "reconcile" }, "state": { "enum": ["settled", "refunded"] } }, "required": ["operation", "state"] }
+      ]
+    },
+    {
+      "if": { "properties": { "state": { "const": "reconciliation_required" } }, "required": ["state"] },
+      "then": { "required": ["reason_code", "reconciliation_case_id"] }
+    },
+    {
+      "if": { "properties": { "state": { "const": "settled" } }, "required": ["state"] },
+      "then": { "required": ["usage", "price_version"] }
+    },
+    {
+      "if": { "properties": { "operation": { "const": "reconcile" } }, "required": ["operation"] },
+      "then": { "required": ["reconciliation_case_id", "reason_code"] }
+    },
+    {
+      "if": { "properties": { "operation": { "enum": ["dispatch", "settle"] } }, "required": ["operation"] },
+      "then": { "required": ["attempt_id"] }
+    },
+    {
+      "if": { "properties": { "operation": { "const": "refund" } }, "required": ["operation"] },
+      "then": { "required": ["reason_code"] }
+    }
+  ],
+  "additionalProperties": true,
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "event_id": "evt_01J00000000000000000000000",
+      "occurred_at": "2026-08-13T12:00:00Z",
+      "request_id": "req_01J00000000000000000000000",
+      "trace_id": "tr_01J00000000000000000000000",
+      "operation": "reserve",
+      "state": "reserved",
+      "funding_source": "public_benefit",
+      "amount": { "value": 1000, "unit": "QUOTA" },
+      "idempotency_key": "idem_01J0000000000000000000000"
+    }
+  ]
+}

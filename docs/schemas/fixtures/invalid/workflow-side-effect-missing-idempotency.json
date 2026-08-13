@@ -1,0 +1,25 @@
+{
+  "schema": "workflow-manifest.v1.schema.json",
+  "description": "side-effecting workflow blocks declare idempotency",
+  "instance": {
+    "schema_version": "1.0",
+    "workflow_id": "group-chat",
+    "version": "1.0.0",
+    "status": "preview",
+    "entry_schema": "message-envelope.v1.schema.json",
+    "output_schema": "message-envelope.v1.schema.json",
+    "blocks": [
+      {
+        "id": "conversation.reply",
+        "version": "1.0.0",
+        "input_schema": "message-envelope.v1.schema.json",
+        "output_schema": "message-envelope.v1.schema.json",
+        "side_effects": ["paid_call", "data_write"],
+        "billing": "platform",
+        "timeout_ms": 120000,
+        "retry": "idempotency_key"
+      }
+    ],
+    "limits": { "timeout_ms": 180000, "max_paid_calls": 4 }
+  }
+}

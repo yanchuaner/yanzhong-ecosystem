@@ -1,0 +1,195 @@
+schema_version: 1
+
+ecosystem:
+  name_zh: 燕中生态
+  name_en: Yanzhong Ecosystem
+  keywords:
+    - 燕中
+    - yanchuaner
+
+governance:
+  repository: https://github.com/yanchuaner/yanzhong-ecosystem.git
+  default_branch: main
+  license: AGPL-3.0-only
+  state_document: docs/燕中生态项目关系.txt
+
+repositories:
+  - id: web_yanchuaner
+    directory: web_yanchuaner
+    repository: https://github.com/yanchuaner/web_yanchuaner.git
+    default_branch: main
+    product: 燕中主站
+    responsibility: 唯一身份源、成员、内容、活动与运营后台
+    data_authorities:
+      - identity
+      - membership
+      - content
+      - activity
+    integration_dependencies: []
+    required_documents:
+      - docs/README.md
+      - docs/architecture.md
+    documentation_roots:
+      - docs
+    brand_surface_roots:
+      - src
+    brand_surface_files:
+      - docker-compose.yml
+      - scripts/seed_content_sections.ts
+    license_metadata:
+      - package.json
+      - package-lock.json
+    release_manifest: package.json
+    autonomous_license: AGPL-3.0-only
+
+  - id: api_yanchuaner
+    directory: api_yanchuaner
+    repository: https://github.com/yanchuaner/api_yanchuaner.git
+    default_branch: main
+    product: 燕中 API
+    responsibility: 统一 AI API 网关、策略、路由、凭据、计费、流水与审计
+    data_authorities:
+      - capability_catalog
+      - gateway_policy
+      - virtual_key
+      - entitlement
+      - billing_ledger
+      - request_audit
+    integration_dependencies:
+      - web_yanchuaner
+    required_documents:
+      - docs/yanchuaner/README.md
+      - docs/yanchuaner/architecture.md
+      - docs/yanchuaner/yancore-api.md
+    documentation_roots:
+      - docs/yanchuaner
+    additional_governance_files:
+      - .github/CODE_OF_CONDUCT.md
+      - .github/SECURITY.md
+    brand_surface_roots:
+      - web/default/src
+    release_manifest: web/default/package.json
+    autonomous_license: AGPL-3.0-only
+    upstream:
+      relationship: modified_distribution
+      repository: https://github.com/QuantumNous/new-api.git
+
+  - id: ai_yanchuaner
+    directory: ai_yanchuaner
+    repository: https://github.com/yanchuaner/ai_yanchuaner.git
+    default_branch: main
+    product: 燕中 AI
+    responsibility: AI 使用层、会话、角色、世界、知识、记忆与工作流
+    data_authorities:
+      - conversation
+      - persona
+      - world
+      - knowledge
+      - memory
+      - workflow
+    integration_dependencies:
+      - web_yanchuaner
+      - api_yanchuaner
+    required_documents:
+      - docs/README.md
+      - docs/architecture.md
+    documentation_roots:
+      - docs
+    brand_surface_roots:
+      - apps/ai-web/src
+    license_metadata:
+      - package.json
+      - apps/ai-web/package.json
+    release_manifest: package.json
+    autonomous_license: AGPL-3.0-only
+    references:
+      - relationship: usage_layer_reference
+        repository: https://github.com/lss233/kirara-ai.git
+      - relationship: replaceable_infrastructure
+        repository: https://github.com/BerriAI/litellm.git
+
+  - id: mp_yanchuaner
+    directory: mp_yanchuaner
+    repository: https://github.com/yanchuaner/mp_yanchuaner.git
+    default_branch: main
+    product: 燕中校友汇小程序
+    responsibility: 主站在微信环境中的客户端与平台适配器
+    data_authorities: []
+    integration_dependencies:
+      - web_yanchuaner
+    required_documents:
+      - docs/README.md
+      - docs/architecture.md
+    documentation_roots:
+      - docs
+    brand_surface_roots:
+      - src
+    license_metadata:
+      - package.json
+      - package-lock.json
+    release_manifest: package.json
+    autonomous_license: AGPL-3.0-only
+
+  - id: lab_yanchuaner
+    directory: lab_yanchuaner
+    repository: https://github.com/yanchuaner/lab_yanchuaner.git
+    default_branch: main
+    product: 燕中科创实验室
+    responsibility: 教程、学习路径、项目展示与公开贡献入口
+    data_authorities:
+      - learning_content
+    integration_dependencies: []
+    required_documents:
+      - docs/README.md
+      - docs/architecture.md
+    documentation_roots:
+      - docs
+    brand_surface_roots:
+      - src
+    license_metadata:
+      - package.json
+    release_manifest: package.json
+    autonomous_license: AGPL-3.0-only
+
+  - id: yczx_code
+    directory: yczx_code
+    repository: https://github.com/yanchuaner/yczx_code.git
+    default_branch: main
+    product: YCZX Code
+    responsibility: 通过统一网关工作的本地 Coding Agent
+    data_authorities:
+      - local_agent_session
+      - local_tool_policy
+    integration_dependencies:
+      - api_yanchuaner
+    required_documents:
+      - docs/README.md
+      - docs/ARCHITECTURE.md
+    documentation_roots:
+      - docs
+    brand_surface_roots:
+      - src
+    license_metadata:
+      - pyproject.toml
+    autonomous_license: AGPL-3.0-only
+
+  - id: yczx_code_lab
+    directory: yczx_code_lab
+    repository: https://github.com/yanchuaner/yczx_code_lab.git
+    default_branch: main
+    product: YCZX Code Lab
+    responsibility: 学习、练习与可复现实验平台
+    data_authorities:
+      - learning_record
+      - isolated_experiment
+    integration_dependencies: []
+    related_repositories:
+      - yczx_code
+    required_documents:
+      - docs/README.md
+      - docs/architecture.md
+    documentation_roots:
+      - docs
+    license_metadata:
+      - pyproject.toml
+    autonomous_license: AGPL-3.0-only

@@ -1,0 +1,16 @@
+{
+  "schema": "telemetry-event.v1.schema.json",
+  "description": "failed telemetry events carry a stable error code",
+  "instance": {
+    "schema_version": "1.0",
+    "event_id": "evt_01J00000000000000000000000",
+    "timestamp": "2026-08-13T12:00:00Z",
+    "service": "ai-web",
+    "component": "workflow.runtime",
+    "environment": "preview",
+    "version": "20260813-a1b2c3d",
+    "event": "workflow.step.completed",
+    "outcome": "failure",
+    "attributes": {}
+  }
+}

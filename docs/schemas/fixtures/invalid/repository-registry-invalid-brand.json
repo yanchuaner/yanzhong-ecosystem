@@ -1,0 +1,32 @@
+{
+  "schema": "repository-registry.v1.schema.json",
+  "instance": {
+    "schema_version": 1,
+    "ecosystem": {
+      "name_zh": "燕中生态",
+      "name_en": "Yanzhong Ecosystem",
+      "keywords": ["yanchuaner", "燕中"]
+    },
+    "governance": {
+      "repository": "https://github.com/yanchuaner/yanzhong-ecosystem.git",
+      "default_branch": "main",
+      "license": "AGPL-3.0-only",
+      "state_document": "docs/state.txt"
+    },
+    "repositories": [
+      {
+        "id": "example_service",
+        "directory": "example_service",
+        "repository": "https://github.com/yanchuaner/example_service.git",
+        "default_branch": "main",
+        "product": "Example Service",
+        "responsibility": "验证错误关键词顺序会被拒绝",
+        "data_authorities": ["example_data"],
+        "integration_dependencies": [],
+        "required_documents": ["docs/README.md"],
+        "documentation_roots": ["docs"],
+        "autonomous_license": "AGPL-3.0-only"
+      }
+    ]
+  }
+}

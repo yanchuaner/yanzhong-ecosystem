@@ -1,0 +1,11 @@
+{
+  "schema": "error-envelope.v1.schema.json",
+  "description": "cross-system error envelopes declare their schema version",
+  "instance": {
+    "error": {
+      "code": "quota_exhausted",
+      "message": "公益额度不足。",
+      "retryable": false
+    }
+  }
+}

@@ -1,0 +1,61 @@
+name: 生态架构提案
+description: 提议跨仓契约、数据所有权、项目边界或生态治理变更。
+title: "[提案] "
+labels:
+  - proposal
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        本仓只处理生态级规范与跨仓边界。单仓实现问题请提交到对应项目仓库；安全问题请使用私密漏洞报告。
+  - type: textarea
+    id: problem
+    attributes:
+      label: 问题与证据
+      description: 说明当前行为、实际影响和可核实证据，不写实现愿望清单。
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: 边界与非目标
+      description: 列出涉及的仓库、用户、数据和明确不处理的事项。
+    validations:
+      required: true
+  - type: textarea
+    id: contract
+    attributes:
+      label: 契约与数据所有权
+      description: 说明提供方、消费者、权威写入者、版本、错误、幂等、观测和删除边界。
+    validations:
+      required: true
+  - type: textarea
+    id: options
+    attributes:
+      label: 备选方案与取舍
+      description: 至少说明保留现状与建议方案的代价。
+    validations:
+      required: true
+  - type: textarea
+    id: migration
+    attributes:
+      label: 迁移、验证与回滚
+      description: 写明合并顺序、兼容窗口、验收证据、停止条件和回滚方式。
+    validations:
+      required: true
+  - type: textarea
+    id: security
+    attributes:
+      label: 安全、费用、许可与品牌
+      description: 说明敏感数据、费用承担、第三方来源、许可证和品牌影响；没有影响时写“无”并说明依据。
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: 提交确认
+      options:
+        - label: 我已阅读根 AGENTS.md、架构、契约和阶段状态真值。
+          required: true
+        - label: 本提案不包含密钥、个人信息、漏洞细节或生产内部地址。
+          required: true

@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.yanchuaner.cn/ecosystem/v1/repository-registry.v1.schema.json",
+  "title": "Yanzhong Ecosystem Repository Registry v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "ecosystem", "governance", "repositories"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "ecosystem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name_zh", "name_en", "keywords"],
+      "properties": {
+        "name_zh": { "const": "燕中生态" },
+        "name_en": { "const": "Yanzhong Ecosystem" },
+        "keywords": {
+          "type": "array",
+          "prefixItems": [
+            { "const": "燕中" },
+            { "const": "yanchuaner" }
+          ],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2
+        }
+      }
+    },
+    "governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "default_branch", "license", "state_document"],
+      "properties": {
+        "repository": { "$ref": "#/$defs/repositoryUrl" },
+        "default_branch": { "const": "main" },
+        "license": { "const": "AGPL-3.0-only" },
+        "state_document": { "$ref": "#/$defs/relativePath" }
+      }
+    },
+    "repositories": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/repository" }
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\u0000]+$"
+    },
+    "repositoryUrl": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://github\\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+\\.git$"
+    },
+    "stringList": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "pathList": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/relativePath" },
+      "uniqueItems": true
+    },
+    "sourceRelationship": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["relationship", "repository"],
+      "properties": {
+        "relationship": { "type": "string", "minLength": 1 },
+        "repository": { "$ref": "#/$defs/repositoryUrl" }
+      }
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "directory",
+        "repository",
+        "default_branch",
+        "product",
+        "responsibility",
+        "data_authorities",
+        "integration_dependencies",
+        "required_documents",
+        "documentation_roots",
+        "autonomous_license"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "directory": { "$ref": "#/$defs/identifier" },
+        "repository": { "$ref": "#/$defs/repositoryUrl" },
+        "default_branch": { "const": "main" },
+        "product": { "type": "string", "minLength": 1 },
+        "responsibility": { "type": "string", "minLength": 1 },
+        "data_authorities": { "$ref": "#/$defs/stringList" },
+        "integration_dependencies": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/identifier" },
+          "uniqueItems": true
+        },
+        "related_repositories": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/identifier" },
+          "uniqueItems": true
+        },
+        "required_documents": { "$ref": "#/$defs/pathList" },
+        "documentation_roots": { "$ref": "#/$defs/pathList" },
+        "additional_governance_files": { "$ref": "#/$defs/pathList" },
+        "brand_surface_roots": { "$ref": "#/$defs/pathList" },
+        "brand_surface_files": { "$ref": "#/$defs/pathList" },
+        "license_metadata": { "$ref": "#/$defs/pathList" },
+        "release_manifest": { "$ref": "#/$defs/relativePath" },
+        "autonomous_license": { "const": "AGPL-3.0-only" },
+        "upstream": { "$ref": "#/$defs/sourceRelationship" },
+        "references": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/sourceRelationship" },
+          "uniqueItems": true
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema_version": 1,
+      "ecosystem": {
+        "name_zh": "燕中生态",
+        "name_en": "Yanzhong Ecosystem",
+        "keywords": ["燕中", "yanchuaner"]
+      },
+      "governance": {
+        "repository": "https://github.com/yanchuaner/yanzhong-ecosystem.git",
+        "default_branch": "main",
+        "license": "AGPL-3.0-only",
+        "state_document": "docs/state.txt"
+      },
+      "repositories": [
+        {
+          "id": "example_service",
+          "directory": "example_service",
+          "repository": "https://github.com/yanchuaner/example_service.git",
+          "default_branch": "main",
+          "product": "Example Service",
+          "responsibility": "演示注册表结构",
+          "data_authorities": ["example_data"],
+          "integration_dependencies": [],
+          "required_documents": ["docs/README.md"],
+          "documentation_roots": ["docs"],
+          "autonomous_license": "AGPL-3.0-only"
+        }
+      ]
+    }
+  ]
+}

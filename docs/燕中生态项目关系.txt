@@ -1,0 +1,218 @@
+# 燕中生态阶段状态
+
+更新日期：2026-08-13
+
+本文件是生态阶段状态的唯一真值，只记录当前事实、验收范围、未闭环风险和带日期的里程碑。长期规则见 `architecture.md` 与 `contracts.md`，缺陷和迁移顺序见 `architecture-review.md` 与 `roadmap.md`。架构中存在某个模块或契约，不表示代码已经实现。
+
+## 当前快照
+
+总体状态：`PREVIEW_IN_OPERATION_AND_ARCHITECTURE_CONVERGENCE`
+
+- `yanchuaner.cn`、`api.yanchuaner.cn`、`ai.yanchuaner.cn` 已形成真实身份、模型调用和逐主体账本链路。
+- 主站是唯一身份源；燕中 API 的不可变流水是权益与消费账本真值。
+- 自主 AI Web 已是公开 AI 产品入口。Open WebUI 只保留为内网过渡客户端，LiteLLM 只保留为可替换设施适配器与成本核对工具。
+- 九份跨系统契约与一份仓库注册表已有生态级 JSON Schema 基线；提供方/消费者接入、契约测试、完整计费终态、端到端 trace 和 AI 使用层模块化尚未完成。
+- 工作区根目录尚未纳入独立 Git 仓库，生态规范、schema 与 ADR 缺少可评审和可回滚的发布载体。
+- 2026-08-13 的锁文件审计中，主站生产依赖未发现已知漏洞；API、AI、Lab 与小程序仍有未经完整可达性评估的 high/critical 公告，不能仅凭构建通过进入新发布。
+- 小程序、Lab 和两个 YCZX 仓库处于不同成熟度，不能按主站、API、AI 的生产状态推定其已达到同等门槛。
+- Forum、Birthday 与 App 尚未建立正式运行仓库，不属于当前已交付能力。
+
+当前最高优先级：
+
+1. 将根级治理文件、schema 和 ADR 纳入独立、受保护的版本控制与 PR 流程。
+2. 评估并修复公开发布产物的 high/critical 依赖公告；临时接受项必须有证据、owner、缓解和到期日。
+3. 完成真实上游失败、断流、超时、重试、退款和 request ID 对账。
+4. 将统一错误、能力目录、消息信封、工作流事件和追踪 schema 接入提供方、消费者与契约测试。
+5. 拆分 AI Web 大型页面控制器与对话处理器，建立工作流、能力和仓储端口。
+6. 将燕中 Credential、Policy、Request 和 Ledger 语义进一步从 New API 内部结构中独立。
+7. 按增量替换第三方可见品牌和临时资产，同时保留法定上游署名。
+
+## 架构基线
+
+2026-08-13 起，新增能力遵循以下依赖方向：
+
+```text
+Web / Mini Program / YCZX Code / future adapters
+                    |
+                    v
+             AI usage layer
+                    |
+                    v
+       api.yanchuaner.cn unified AI gateway
+                    |
+                    v
+   provider and infrastructure adapters
+```
+
+- `web_yanchuaner` 拥有身份与主站内容。
+- `ai_yanchuaner` 拥有会话、角色、世界、知识、记忆、媒体元数据和工作流。
+- `api_yanchuaner` 拥有主体凭据、权限策略、能力与路由、额度、账本和模型审计。
+- 客户端只依赖燕中发布的契约，不依赖供应商、渠道 ID、New API 表结构或 LiteLLM 管理对象。
+- 模块通过版本化端口和 schema 扩展；未建立权限、版本、审计和隔离前不执行第三方插件。
+
+这套基线约束所有新代码。现有代码按 `roadmap.md` 渐进迁移，不以 Preview 结束为重构起点。
+
+## 子系统状态
+
+### yanchuaner.cn / web_yanchuaner
+
+状态：`PRODUCTION_IDENTITY_SOURCE`
+
+已验证：
+
+- 新版主站已部署至主域并成为唯一身份源。
+- OIDC/OAuth 支持精确回调、S256 PKCE、state、nonce、RS256 ID Token、JWKS 和一次性授权码。
+- API 与自主 AI Web 的管理员、普通成员真实 HTTPS 回调已通过。
+- 主站停用与角色变化通过签名身份事件通知 API；生产 webhook 已完成冒烟。
+- 小程序 Bearer Token 与网站 Cookie 保持传输层隔离，共用服务端用户状态与会话失效规则。
+
+仍需持续验证：身份事件积压与重放、定期恢复演练、真实移动端流程、邮件与观察期告警。生产 `prod.db`、`.env` 和主站服务继续受硬红线保护。
+
+### api.yanchuaner.cn / api_yanchuaner
+
+状态：`PRODUCTION_GATEWAY_BILLING_HARDENING`
+
+已验证：
+
+- 主站 OIDC 成员映射、管理员角色同步、本地密码入口关闭和重复主体复用。
+- YanCore Subject Grant、固定 UserInfo 复验、并发会话指针、最长 15 分钟的逐主体短期应用 Key。
+- 新虚拟 Key 仅展示一次并保存哈希；模型、预算、有效期、IP、RPM/TPM/并发策略可约束。
+- 公益、活动与兼容余额按 funding source 区分；管理员发放要求原因和不可变流水。
+- 同步 OpenAI Chat/Responses 路径具备预扣、结算、退款代码与局部验收。
+- DeepSeek 文本调用和 SiliconFlow `BAAI/bge-m3` 嵌入调用已进入真实链路并记账。
+
+未闭环：
+
+- 真实上游失败、断流、超时、重复请求和跨渠道故障矩阵尚未完整验收。
+- 当前进程内 `BillingSession` 不能替代持久化请求状态机；异步结算、补偿和未终结预留巡检仍需实现。
+- capability catalog、统一错误信封和 trace schema 已建立生态基线，但 API 尚未发布运行时目录，也未完成跨仓契约测试。
+- YanCore 策略仍部分投影到 New API Token/路由结构，需要建立可重建的兼容投影。
+
+异步、媒体和任务协议在持久化预扣/结算完成前保持 fail-closed。`users.quota` 只作兼容投影，不是账本真值。
+
+### ai.yanchuaner.cn / ai_yanchuaner
+
+状态：`PRODUCTION_USAGE_LAYER_MODULARIZATION_REQUIRED`
+
+已验证：
+
+- 自主 `apps/ai-web` 已上线，使用独立 OIDC 客户端、加密 HttpOnly 会话、YanCore 交换和短期应用 Key；浏览器不接触网关 Key。
+- 普通助手、角色扮演、多人群聊、个人角色库、会话管理和 Markdown 消息已投入 Preview。
+- 角色资料与用户资料支持隔离 RAG；角色长期记忆支持跨会话摘要、查看与清理。
+- 世界实体、世界快照、用户扮演角色和群聊世界注入已投入 Preview。
+- 角色卡支持 chara_card_v3 导入导出并保留扩展字段和来源信息。
+- 图片理解、图片生成、语音输入与朗读已接入用户自配的兼容服务；凭据加密并按用户隔离。
+- 账号停用后的 API 撤销与 AI Web 会话清理已经接入。
+
+未闭环：
+
+- `page.tsx` 同时承担多领域状态与动作，`chat-handler.ts` 同时承担鉴权、RAG、记忆、调度、提示和网关调用。
+- 会话、角色、世界、知识和设置仍主要使用文件适配器与进程内锁，尚未完成正式仓储端口和 schema 迁移。
+- `chat`、`roleplay`、`group` 尚未成为版本化工作流；统一消息信封与工作流清单已有 schema 基线，但尚未接入运行时。
+- 群聊的一次操作尚不能用统一 trace 完整关联调度、角色、嵌入、模型与账单。
+- API 托管 Key 管理、外部插件执行和公开角色分享均未开放。
+
+Open WebUI 与 LiteLLM PoC 不再定义公网产品能力，也不得与个人公益额度链路混账。
+
+### mp_yanchuaner
+
+状态：`CLIENT_IMPLEMENTED_DEVICE_ACCEPTANCE_PENDING`
+
+当前代码覆盖微信登录、身份申请、资料、新闻、活动、报名、隐私和注销页面，并通过主站 `/api/mp` 契约访问数据。微信 AppSecret 只在主站服务端保存。
+
+未闭环：真实设备、弱网、会话恢复、隐私授权、重复写操作和完整活动流程仍需联合验收。小程序是主站的微信客户端，不是移动服务端或第二套社区。
+
+### lab_yanchuaner
+
+状态：`PUBLISHABLE_CONTENT_SITE`
+
+当前已有 Next.js 站点、中文教程、部分英文内容、学习路径、项目展示、设计规范、内容审计、链接审计和发布门禁。Lab 是内容发布与公开学习入口，不是运行时共享组件仓或生产功能孵化仓。
+
+未闭环：补齐公开内容的真实执行复核、翻译审校、项目状态同步和正式发布验收。共享设计包在具备版本、负责人和兼容测试前不存在。
+
+### yczx_code
+
+状态：`INITIAL_SCAFFOLD`
+
+当前正式代码仅提供可安装包骨架以及 CLI 帮助、版本信息和基础测试。Provider、ReAct、只读工具、统一 Policy 与 Context 仍是目标架构，不得写成已实现能力。
+
+下一门槛：先完成公共对象与 FakeProvider，再完成工作区隔离的只读工具、有界 Agent 循环和燕中网关适配器。文件写入、任意 Shell、MCP、多 Agent 和插件继续关闭。
+
+### yczx_code_lab
+
+状态：`ACTIVE_LEARNING_REPOSITORY`
+
+当前维护 YCZX Code 学习路径、教程、个人记录、练习和公共示例。实验代码不自动进入 `yczx_code`；正式采用必须在目标仓重新设计、测试、登记来源并评审。
+
+### 规划项目
+
+- `forum.yanchuaner.cn`：尚无正式仓库。内容治理、审核、举报和退出机制完成前不开放匿名发帖。
+- `birthday.yanchuaner.cn`：尚无正式服务。明确授权、隐私、手动退出和数据删除完成前不导入或推断生日。
+- App：远期客户端，复用主站移动 API 和统一网关契约，不复制小程序或主站数据层。
+
+## 当前生产链路
+
+身份链路：
+
+```text
+member -> yanchuaner.cn OIDC -> downstream subject mapping
+       -> signed identity event -> revoke grants, keys and sessions
+```
+
+自主 AI 调用链路：
+
+```text
+member
+  -> ai.yanchuaner.cn OIDC session
+  -> API verifies fixed UserInfo endpoint
+  -> short-lived YanCore grant and application key
+  -> AI BFF calls api.yanchuaner.cn/v1
+  -> gateway policy, routing, reserve, settle/refund and audit
+  -> approved provider adapter
+```
+
+Open WebUI 过渡链路使用受限服务账户，不继承个人主体，不扣减个人公益额度。LiteLLM 内部费用只用于设施成本核对，不能覆盖燕中账本。
+
+## 状态口径
+
+- `已实现`：代码和局部自动测试存在。
+- `合同通过`：提供方与消费者对同一 schema 或 fixture 通过自动检查。
+- `隔离验收`：使用可销毁数据和真实进程完成端到端流程。
+- `真实上游验收`：使用获授权供应商和可撤销测试凭据验证调用、费用与故障。
+- `生产验收`：在正式域名、正式身份和受控生产配置下完成，并有监控与回滚证据。
+
+较低层级的结果不能替代较高层级。历史 PoC 使用本机兼容上游的结果，只证明协议和本地链路；DeepSeek 与 SiliconFlow 的已登记调用属于真实上游验收，但不证明所有供应商和故障路径均已通过。
+
+## 许可、来源与品牌
+
+- 各仓自主代码与原创文档统一采用 AGPL-3.0；第三方依赖和材料保持原许可证。
+- `api_yanchuaner` 是 QuantumNous/new-api 的 AGPLv3 修改版，保留 LICENSE、NOTICE、版权头、可见署名与上游链接，不把相邻上游代码标为燕中原创。
+- `ai_yanchuaner` 的自主 Web、YanCore 客户端和领域实现独立登记；Kirara AI 是使用层架构参考，LiteLLM 是设施依赖，Open WebUI 是过渡客户端。
+- 燕中 Logo、名称、图标、域名 metadata 与产品文案按 `brand.md` 渐进统一。替换可见品牌不删除法定第三方归属。
+- 采用或改写外部代码时同步维护来源矩阵、版权头、NOTICE、兼容测试和回滚说明；改名、格式化或自动改写不改变来源性质。
+
+## 已确认里程碑
+
+- 2026-08-01：新版主站在备份、迁移演练和自动回滚保护下切换至 `yanchuaner.cn`；生产迁移和数据校验完成。
+- 2026-08-12：主站与 API 发布至生产，身份事件 webhook 冒烟通过。
+- 2026-08-13：自主 AI Web 已在 `ai.yanchuaner.cn` 提供真实 DeepSeek 对话；角色、群聊、RAG、记忆、世界、媒体等 Preview 能力形成当前产品面。
+- 2026-08-13：生态级自主 IP、统一 API 网关、AI 使用层、模块化适配器、版本化工作流与统一可观测性确立为长期架构基线。
+- 2026-08-13：“燕中”与 `yanchuaner` 均确认为生态 IP 和核心关键词，正式名称只使用“燕中生态 / Yanzhong Ecosystem”；自主内容默认采用 `AGPL-3.0-only`，既有第三方与历史授权继续按原条款保留。
+- 2026-08-13：身份、能力、错误、消息、工作流、扩展、计费和遥测形成九份跨系统 JSON Schema，仓库注册表形成一份治理 Schema；九个内嵌有效示例通过，七个负向 fixture 被校验器拒绝。运行时接入和消费者契约测试尚未完成。
+- 2026-08-13：生态治理文件进入独立 `yanzhong-ecosystem` 仓库，七个项目继续保持独立 Git 历史；项目注册表、独立/工作区双模式验证和治理 CI 建立。消费者固定契约版本仍未完成。
+- 2026-08-13：ADR 0004 确认治理仓不使用 submodule、subtree 或 vendoring 聚合项目源码，完整工作区由 `repos.yaml` 和独立 checkout 组成。
+- 2026-08-13：主站完整发布门禁通过；API 前后端构建、核心 Go 包测试和本次前端文件定向 Lint 通过；AI Web 类型/测试/构建、Lab 类型/Lint/内容/链接/构建、小程序类型/微信构建和 YCZX Code 门禁通过。API 全量前端 Lint及 API、AI、Lab、小程序依赖审计仍阻断发布，不因功能构建通过而关闭。
+
+## Preview 退出条件
+
+- 核心身份、模型、计费和撤销路径没有未处理的 P0 问题。
+- 任一付费请求可按 request ID 得到唯一终态并与不可变流水核对。
+- API/AI 的机器可读契约与消费者合同测试通过，跨服务 trace 可定位群聊等扇出调用。
+- 数据备份、恢复、迁移和故障回滚至少完成一次可重复演练。
+- 小程序在真实设备与弱网下完成身份、隐私和活动闭环。
+- 公开入口具备明确品牌、源码入口、许可证、第三方归属、安全披露和数据删除说明。
+- 未达到上述门槛的能力继续标记 Preview、受控或规划，不以版本名称代替验收。
+
+## 维护规则
+
+新增仓库、子域或生产能力时，在本文件登记所有者、身份来源、数据真值、调用方向、当前验收层级、关闭与迁移方式。更新当前状态时保留有价值的日期证据，但删除被后续事实取代的“下一步”和旧当前结论。

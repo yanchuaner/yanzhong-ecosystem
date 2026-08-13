@@ -1,0 +1,15 @@
+{
+  "schema": "billing-event.v1.schema.json",
+  "description": "reserve operation cannot produce a settled state",
+  "instance": {
+    "schema_version": "1.0",
+    "event_id": "evt_01J00000000000000000000000",
+    "occurred_at": "2026-08-13T12:00:00Z",
+    "request_id": "req_01J00000000000000000000000",
+    "operation": "reserve",
+    "state": "settled",
+    "funding_source": "public_benefit",
+    "amount": { "value": 1000, "unit": "QUOTA" },
+    "idempotency_key": "idem_01J0000000000000000000000"
+  }
+}

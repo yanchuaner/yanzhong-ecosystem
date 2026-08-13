@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.yanchuaner.cn/ecosystem/v1/error-envelope.v1.schema.json",
+  "title": "Yanzhong Error Envelope v1",
+  "type": "object",
+  "required": ["schema_version", "error"],
+  "properties": {
+    "schema_version": {
+      "$ref": "common-defs.v1.schema.json#/$defs/schemaVersion"
+    },
+    "error": {
+      "type": "object",
+      "required": ["code", "message", "retryable"],
+      "properties": {
+        "code": {
+          "$ref": "common-defs.v1.schema.json#/$defs/stableCode"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "request_id": {
+          "oneOf": [
+            { "$ref": "common-defs.v1.schema.json#/$defs/opaqueId" },
+            { "type": "null" }
+          ]
+        },
+        "trace_id": {
+          "oneOf": [
+            { "$ref": "common-defs.v1.schema.json#/$defs/opaqueId" },
+            { "type": "null" }
+          ]
+        },
+        "retry_after_ms": {
+          "$ref": "common-defs.v1.schema.json#/$defs/nonNegativeInteger"
+        },
+        "details": {
+          "type": "object",
+          "maxProperties": 32,
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true,
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "error": {
+        "code": "quota_exhausted",
+        "message": "公益额度不足。",
+        "retryable": false,
+        "request_id": "req_01J00000000000000000000000",
+        "trace_id": "tr_01J00000000000000000000000",
+        "details": {}
+      }
+    }
+  ]
+}

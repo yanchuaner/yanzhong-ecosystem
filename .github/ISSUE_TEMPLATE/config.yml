@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 私密安全报告
+    url: https://github.com/yanchuaner/yanzhong-ecosystem/security/advisories/new
+    about: 漏洞、凭据、隐私或可被滥用的细节只能通过私密渠道提交。
+  - name: 项目实现问题
+    url: https://github.com/yanchuaner
+    about: 单个产品的代码缺陷应提交到对应项目仓库。

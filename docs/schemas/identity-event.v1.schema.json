@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.yanchuaner.cn/ecosystem/v1/identity-event.v1.schema.json",
+  "title": "Yanzhong Identity Event v1",
+  "type": "object",
+  "required": ["schema_version", "event_id", "type", "occurred_at", "subject", "data"],
+  "properties": {
+    "schema_version": {
+      "$ref": "common-defs.v1.schema.json#/$defs/schemaVersion"
+    },
+    "event_id": {
+      "$ref": "common-defs.v1.schema.json#/$defs/opaqueId"
+    },
+    "type": {
+      "enum": [
+        "identity.account.disabled",
+        "identity.sessions.revoked",
+        "identity.role.changed"
+      ]
+    },
+    "occurred_at": {
+      "$ref": "common-defs.v1.schema.json#/$defs/timestamp"
+    },
+    "subject": {
+      "$ref": "common-defs.v1.schema.json#/$defs/subject"
+    },
+    "data": {
+      "type": "object",
+      "required": ["session_version"],
+      "properties": {
+        "session_version": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "role": {
+          "enum": ["admin", "alumni", "student", "teacher"]
+        },
+        "reason_code": {
+          "$ref": "common-defs.v1.schema.json#/$defs/stableCode"
+        }
+      },
+      "additionalProperties": true
+    },
+    "trace_id": {
+      "$ref": "common-defs.v1.schema.json#/$defs/opaqueId"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "type": { "const": "identity.role.changed" } },
+        "required": ["type"]
+      },
+      "then": {
+        "properties": {
+          "data": { "required": ["session_version", "role"] }
+        }
+      }
+    }
+  ],
+  "additionalProperties": true,
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "event_id": "evt_01J00000000000000000000000",
+      "type": "identity.account.disabled",
+      "occurred_at": "2026-08-13T12:00:00Z",
+      "subject": "main-site-subject",
+      "data": { "session_version": 4 }
+    }
+  ]
+}

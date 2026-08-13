@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.yanchuaner.cn/ecosystem/v1/capability.v1.schema.json",
+  "title": "Yanzhong Capability Descriptor v1",
+  "type": "object",
+  "required": ["schema_version", "id", "version", "modalities", "streaming", "billing", "availability"],
+  "properties": {
+    "schema_version": {
+      "$ref": "common-defs.v1.schema.json#/$defs/schemaVersion"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z0-9]+)+$",
+      "maxLength": 96
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*$",
+      "maxLength": 8
+    },
+    "display_name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 512
+    },
+    "modalities": {
+      "type": "object",
+      "required": ["input", "output"],
+      "properties": {
+        "input": {
+          "type": "array",
+          "items": { "enum": ["text", "image", "audio", "video", "document"] },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "output": {
+          "type": "array",
+          "items": { "enum": ["text", "image", "audio", "video", "embedding", "tool_call"] },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "streaming": { "type": "boolean" },
+    "billing": {
+      "type": "object",
+      "required": ["mode", "unit"],
+      "properties": {
+        "mode": { "enum": ["platform", "byok", "none"] },
+        "unit": { "enum": ["token", "request", "image", "second", "character", "none"] }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "mode": { "const": "none" } }, "required": ["mode"] },
+          "then": { "properties": { "unit": { "const": "none" } } }
+        },
+        {
+          "if": { "properties": { "mode": { "enum": ["platform", "byok"] } }, "required": ["mode"] },
+          "then": { "properties": { "unit": { "not": { "const": "none" } } } }
+        }
+      ],
+      "additionalProperties": true
+    },
+    "required_scopes": {
+      "type": "array",
+      "items": { "$ref": "common-defs.v1.schema.json#/$defs/stableCode" },
+      "uniqueItems": true,
+      "maxItems": 32
+    },
+    "limits": {
+      "type": "object",
+      "maxProperties": 32,
+      "additionalProperties": {
+        "type": ["integer", "number", "string", "boolean", "null"]
+      }
+    },
+    "availability": {
+      "enum": ["preview", "stable", "degraded", "disabled"]
+    },
+    "deprecation": {
+      "type": "object",
+      "properties": {
+        "replacement": { "type": "string", "maxLength": 96 },
+        "sunset_at": { "$ref": "common-defs.v1.schema.json#/$defs/timestamp" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true,
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "id": "text.chat.general",
+      "version": "1",
+      "modalities": { "input": ["text"], "output": ["text"] },
+      "streaming": true,
+      "billing": { "mode": "platform", "unit": "token" },
+      "required_scopes": ["ai.chat"],
+      "limits": { "max_input_bytes": 32768 },
+      "availability": "preview"
+    }
+  ]
+}

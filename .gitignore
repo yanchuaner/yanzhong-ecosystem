@@ -1,0 +1,28 @@
+# Independent ecosystem repositories. The governance repository never vendors them.
+/web_yanchuaner/
+/api_yanchuaner/
+/ai_yanchuaner/
+/mp_yanchuaner/
+/lab_yanchuaner/
+/yczx_code/
+/yczx_code_lab/
+
+# Repository-local Python environment and generated files.
+/.venv/
+__pycache__/
+*.py[cod]
+/.pytest_cache/
+/.ruff_cache/
+/.mypy_cache/
+
+# Local configuration and transient output.
+.env
+.env.*
+!.env.example
+*.log
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
+/.idea/
+/.vscode/

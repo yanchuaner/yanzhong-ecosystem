@@ -1,0 +1,4 @@
+# Direct dependencies used only by governance and schema validation.
+jsonschema==4.26.0
+PyYAML==6.0.3
+referencing==0.37.0

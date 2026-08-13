@@ -1,0 +1,17 @@
+Yanzhong Ecosystem Notices
+
+Copyright (c) 2026 respective Yanzhong Ecosystem contributors.
+
+Original code and documentation created by Yanzhong Ecosystem contributors are
+licensed under GNU AGPL-3.0-only. See LICENSE.
+
+Individual repositories may contain or distribute third-party software and
+materials under separate licenses. Their LICENSE, NOTICE, copyright headers,
+source matrices, and third-party notices remain authoritative for those parts.
+
+api_yanchuaner is a modified distribution of QuantumNous/new-api and must retain
+the upstream notices and additional terms recorded in that repository.
+
+Kirara AI is an architecture reference for the AI usage layer. LiteLLM is an
+independent infrastructure dependency. These references do not transfer their
+copyrights or trademarks to the Yanzhong Ecosystem.

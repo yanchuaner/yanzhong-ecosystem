@@ -1,0 +1,47 @@
+name: 治理文档缺陷
+description: 报告矛盾、过期、断链、错误状态或无法执行的规范。
+title: "[文档] "
+labels:
+  - documentation
+body:
+  - type: dropdown
+    id: defect
+    attributes:
+      label: 缺陷类型
+      options:
+        - 事实或状态错误
+        - 架构或职责冲突
+        - 契约定义不完整
+        - 链接或命令失效
+        - 品牌、许可或来源错误
+        - 表达含混或重复真值
+    validations:
+      required: true
+  - type: input
+    id: location
+    attributes:
+      label: 文件与位置
+      placeholder: docs/contracts.md 的“计量与账本契约”
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: 当前内容与证据
+      description: 说明哪里错误，并附可公开核实的代码、文档或测试依据。
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 应有结果
+      description: 说明应修正的事实或边界，不要求预先给出完整措辞。
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: 信息安全
+      options:
+        - label: 本报告不包含密钥、个人信息、漏洞细节或生产内部地址。
+          required: true

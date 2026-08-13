@@ -1,0 +1,8 @@
+# 文档迁移说明
+
+本文件原为 Windows Python 初学者教程，内容与 YCZX Code Lab 重复，并包含过期的 YCZX Code 文档路径。
+
+- 燕中生态多仓开发环境基线：`development-environment.md`
+- Windows、Git、Python 3.12、uv 与 VS Code 入门：`../yczx_code_lab/docs/setup/windows.md`
+
+自 2026-08-13 起，不再在此维护第二份安装步骤。项目版本、包管理器和验证命令以目标仓库锁文件、README 与 AGENTS.md 为准。

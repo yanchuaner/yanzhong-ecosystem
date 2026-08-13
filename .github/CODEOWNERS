@@ -1,0 +1,7 @@
+# Review routing only. Production, release, legal, and security authority remain separate.
+* @yanchuaner
+
+/docs/decisions/ @yanchuaner
+/docs/schemas/ @yanchuaner
+/repos.yaml @yanchuaner
+/.github/ @yanchuaner

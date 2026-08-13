@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.yanchuaner.cn/ecosystem/v1/message-envelope.v1.schema.json",
+  "title": "Yanzhong AI Message Envelope v1",
+  "type": "object",
+  "required": ["schema_version", "message_id", "conversation_id", "sender", "parts", "created_at"],
+  "properties": {
+    "schema_version": {
+      "$ref": "common-defs.v1.schema.json#/$defs/schemaVersion"
+    },
+    "message_id": {
+      "$ref": "common-defs.v1.schema.json#/$defs/opaqueId"
+    },
+    "conversation_id": {
+      "$ref": "common-defs.v1.schema.json#/$defs/opaqueId"
+    },
+    "sender": {
+      "type": "object",
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": { "enum": ["user", "assistant", "persona", "system", "tool"] },
+        "id": {
+          "$ref": "common-defs.v1.schema.json#/$defs/opaqueId"
+        },
+        "display_name": { "type": "string", "maxLength": 80 }
+      },
+      "additionalProperties": true
+    },
+    "parts": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "items": { "$ref": "#/$defs/part" }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "adapter": { "$ref": "common-defs.v1.schema.json#/$defs/stableCode" },
+        "reply_to": {
+          "oneOf": [
+            { "$ref": "common-defs.v1.schema.json#/$defs/opaqueId" },
+            { "type": "null" }
+          ]
+        },
+        "trace_id": { "$ref": "common-defs.v1.schema.json#/$defs/opaqueId" }
+      },
+      "additionalProperties": true
+    },
+    "created_at": {
+      "$ref": "common-defs.v1.schema.json#/$defs/timestamp"
+    }
+  },
+  "$defs": {
+    "part": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["type", "text"],
+          "properties": {
+            "type": { "const": "text" },
+            "text": { "type": "string", "minLength": 1, "maxLength": 1048576 }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": ["type", "media_id"],
+          "properties": {
+            "type": { "enum": ["image_ref", "audio_ref"] },
+            "media_id": { "$ref": "common-defs.v1.schema.json#/$defs/opaqueId" },
+            "mime_type": { "type": "string", "maxLength": 128 },
+            "alt": { "type": "string", "maxLength": 512 }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": ["type", "call_id", "name", "arguments"],
+          "properties": {
+            "type": { "const": "tool_call" },
+            "call_id": { "$ref": "common-defs.v1.schema.json#/$defs/opaqueId" },
+            "name": { "$ref": "common-defs.v1.schema.json#/$defs/stableCode" },
+            "arguments": { "type": "object" }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": ["type", "call_id", "status"],
+          "properties": {
+            "type": { "const": "tool_result" },
+            "call_id": { "$ref": "common-defs.v1.schema.json#/$defs/opaqueId" },
+            "status": { "enum": ["success", "error", "denied", "cancelled", "truncated"] },
+            "content": {},
+            "error_code": { "$ref": "common-defs.v1.schema.json#/$defs/stableCode" }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": { "status": { "enum": ["error", "denied"] } },
+                "required": ["status"]
+              },
+              "then": { "required": ["error_code"] }
+            }
+          ],
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": ["type", "code", "message"],
+          "properties": {
+            "type": { "const": "error" },
+            "code": { "$ref": "common-defs.v1.schema.json#/$defs/stableCode" },
+            "message": { "type": "string", "minLength": 1, "maxLength": 512 }
+          },
+          "additionalProperties": true
+        }
+      ]
+    }
+  },
+  "additionalProperties": true,
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "message_id": "msg_01J00000000000000000000000",
+      "conversation_id": "conv_01J0000000000000000000000",
+      "sender": { "kind": "user", "id": "subject_01J00000000000000000000" },
+      "parts": [{ "type": "text", "text": "你好" }],
+      "metadata": { "adapter": "web", "reply_to": null },
+      "created_at": "2026-08-13T12:00:00Z"
+    }
+  ]
+}
